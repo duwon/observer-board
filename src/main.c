@@ -14,36 +14,47 @@ LOG_MODULE_REGISTER(observer_main, LOG_LEVEL_INF);
 #include "usb_dev.h"
 #include "ble_adv.h"
 
-/* UART0 (optional direct write for banner mirroring) */
+/* UART0 디바이스 */
 static const struct device *const uart0_dev = DEVICE_DT_GET(DT_NODELABEL(uart0));
+/**
+ * @brief UART 장치를 사용하여 문자열을 폴링 방식으로 출력합니다.
+ * @param dev 문자열을 출력할 UART 장치 포인터.
+ * @param s 출력할 Null 종료 문자열.
+ */
 
 static inline void _uart_puts(const struct device *dev, const char *s)
 {
-    if (!dev || !device_is_ready(dev) || !s) return;
-    while (*s) uart_poll_out(dev, (unsigned char)(*s++));
+    if (!dev || !device_is_ready(dev) || !s)
+        return;
+    while (*s)
+        uart_poll_out(dev, (unsigned char)(*s++));
 }
+/**
+ * @brief 메인 실행 루프입
+ * @return 0: 정상 종료이나 무한루프로 도달하지 않음.
+ */
 
 int main(void)
 {
-    /* LED init */
+    /*  LED init */
     (void)gpio_if_init();
 
-    /* USB CDC init + DTR wait (5s) */
+    /*  USB CDC init + DTR wait (5s) */
     usbdev_init_and_wait_dtr(5000);
 
-    /* Boot banner (USB CDC + UART0) */
+    /*  Print boot message */
     const char *BOOT_MSG =
         "\r\n======================================\r\n"
         " Observer Board FW Boot Initializing\r\n"
         "======================================\r\n";
-    usbdev_puts(BOOT_MSG);               /* USB CDC: 명시 전송 */
-    _uart_puts(uart0_dev, BOOT_MSG);     /* UART0  : 직접 전송 */
+    usbdev_puts(BOOT_MSG);           /*  USB CDC 전송 */
+    _uart_puts(uart0_dev, BOOT_MSG); /*  UART0   전송 */
 
-    /* Start BLE scan */
+    /*  ble 시작 */
     (void)ble_rx_start();
 
-    /* Heartbeat via LED (logs are on UART0 due to UART console backend) */
-    while (1) {
+    while (1)
+    {
         gpio_if_led_toggle();
         k_sleep(K_SECONDS(1));
     }
