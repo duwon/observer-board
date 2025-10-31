@@ -2,4 +2,8 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(observer_board)
 
-target_sources(app PRIVATE src/main.c)
+include(${ZEPHYR_BASE}/samples/subsys/usb/common/common.cmake)
+zephyr_include_directories(include)
+
+FILE(GLOB app_sources src/*.c)
+target_sources(app PRIVATE ${app_sources})
