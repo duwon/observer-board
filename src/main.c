@@ -8,7 +8,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(observer_main, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 #include "gpio_if.h"
 #include "usb_dev.h"
@@ -40,7 +40,7 @@ int main(void)
     (void)gpio_if_init();
 
     /*  USB CDC init + DTR wait (5s) */
-    usbdev_init_and_wait_dtr(5000);
+    Init_usbdev(5000);
 
     /*  Print boot message */
     const char *BOOT_MSG =
@@ -52,6 +52,9 @@ int main(void)
 
     /*  ble 시작 */
     (void)ble_rx_start();
+
+    /* 디버깅용 코드 */
+
 
     while (1)
     {
